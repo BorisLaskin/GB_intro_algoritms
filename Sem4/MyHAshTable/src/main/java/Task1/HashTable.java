@@ -1,28 +1,21 @@
 package Task1;
 
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-
 public class HashTable<Key, Value> {
 
     private static final int INITSIZE = 16;
-    private ArrayList<Basket> baskets;
+    private Basket[] baskets;
 
     private class Entity {
         private Key key;
         private Value value;
     }
-
     private class Node {
         private Node next;
         private Entity value;
     }
-
     private class Basket {
         private Node head;
-
         private void AddValue(Value value, Key key) {
 
             if (this.head.value == null) {
@@ -70,16 +63,16 @@ public class HashTable<Key, Value> {
     }
 
     public HashTable(int size) {
-        baskets = new ArrayList<Basket>(size);
+        baskets = (Basket[]) new Object[size];
     }
 
     private int GetBasketIndex(Key key) {
-        return key.hashCode() % baskets.size();
+        return key.hashCode() % baskets.length;
     }
 
     public Value GetValue(Key key) {
         int currentBasketIndex = GetBasketIndex(key);
-        Basket currentBasket = baskets.get(currentBasketIndex);
+        Basket currentBasket = baskets[currentBasketIndex];
         if (currentBasket != null) {
             return currentBasket.GetValue(key);
         }
@@ -89,13 +82,13 @@ public class HashTable<Key, Value> {
     public void SetValue(Key key, Value value) {
         int currentBasketIndex = GetBasketIndex(key);
         if (GetValue(key) == null) {
-            baskets.get(currentBasketIndex).AddValue(value, key);
+            baskets[currentBasketIndex].AddValue(value, key);
         }
     }
 
     public void DelValue(Key key) {
         int currentBasketIndex = GetBasketIndex(key);
-        baskets.get(currentBasketIndex).DelValue(key);
+        baskets[currentBasketIndex].DelValue(key);
     }
 
     public void PrintALL() {
@@ -103,7 +96,7 @@ public class HashTable<Key, Value> {
         for (Basket currentBasket : baskets) {
             if (currentBasket != null) {
                 Node currentNode = currentBasket.head;
-                while (currentNode != null) {
+                while (currentNode != null){
                     sb.append(currentNode.value.key).append(" : ").append(currentNode.value.value).append("\t");
                     currentNode = currentNode.next;
                 }
