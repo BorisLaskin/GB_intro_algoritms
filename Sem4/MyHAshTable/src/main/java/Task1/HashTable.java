@@ -1,24 +1,32 @@
 package Task1;
 
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+
 public class HashTable<Key, Value> {
 
     private static final int INITSIZE = 16;
-    private Basket[] baskets;
+    private ArrayList<Basket> baskets;
 
     private class Entity {
         private Key key;
         private Value value;
     }
+
     private class Node {
         private Node next;
         private Entity value;
     }
+
     private class Basket {
         private Node head;
+
         private void AddValue(Value value, Key key) {
 
-            if (this.head.value == null) {
+            if (this.head == null) {
+                this.head = new Node();
                 this.head.value = new Entity();
                 this.head.value.value = value;
                 this.head.value.key = key;
@@ -32,13 +40,12 @@ public class HashTable<Key, Value> {
 
         private Value GetValue(Key key) {
             Node currentNode = head;
-            do {
-                if (currentNode.value.key == key) {
+            while (currentNode != null) {
+                if (currentNode.value.key.equals(key)) {
                     return currentNode.value.value;
                 }
                 currentNode = currentNode.next;
-            } while (currentNode != null);
-
+            }
             return null;
         }
 
@@ -47,8 +54,10 @@ public class HashTable<Key, Value> {
                 Node currentNode = head;
                 boolean found = false;
                 while (!found) {
-                    if (currentNode.value.key == key) {
-                        currentNode.next = currentNode.next.next;
+                    if (currentNode.value.key.equals(key)) {
+                        if (currentNode.next != null)
+                            currentNode.next = currentNode.next.next;
+                        else head = null;
                         found = true;
                     } else {
                         currentNode = currentNode.next;
@@ -63,16 +72,20 @@ public class HashTable<Key, Value> {
     }
 
     public HashTable(int size) {
-        baskets = (Basket[]) new Object[size];
+        baskets = new ArrayList<Basket>(size);
+        for (int i = 0; i < size; i++) {
+            baskets.add(new Basket());
+        }
+
     }
 
     private int GetBasketIndex(Key key) {
-        return key.hashCode() % baskets.length;
+        return key.hashCode() % baskets.size();
     }
 
     public Value GetValue(Key key) {
         int currentBasketIndex = GetBasketIndex(key);
-        Basket currentBasket = baskets[currentBasketIndex];
+        Basket currentBasket = baskets.get(currentBasketIndex);
         if (currentBasket != null) {
             return currentBasket.GetValue(key);
         }
@@ -82,13 +95,13 @@ public class HashTable<Key, Value> {
     public void SetValue(Key key, Value value) {
         int currentBasketIndex = GetBasketIndex(key);
         if (GetValue(key) == null) {
-            baskets[currentBasketIndex].AddValue(value, key);
+            baskets.get(currentBasketIndex).AddValue(value, key);
         }
     }
 
     public void DelValue(Key key) {
         int currentBasketIndex = GetBasketIndex(key);
-        baskets[currentBasketIndex].DelValue(key);
+        baskets.get(currentBasketIndex).DelValue(key);
     }
 
     public void PrintALL() {
@@ -96,7 +109,7 @@ public class HashTable<Key, Value> {
         for (Basket currentBasket : baskets) {
             if (currentBasket != null) {
                 Node currentNode = currentBasket.head;
-                while (currentNode != null){
+                while (currentNode != null) {
                     sb.append(currentNode.value.key).append(" : ").append(currentNode.value.value).append("\t");
                     currentNode = currentNode.next;
                 }
@@ -105,3 +118,4 @@ public class HashTable<Key, Value> {
         System.out.println(sb.toString());
     }
 }
+
